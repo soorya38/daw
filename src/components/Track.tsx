@@ -46,8 +46,7 @@ type Props = {
 }
 
 const Track = ({ self, soundsData, playSound, timeline, setTimeline }: Props) => {
-
-  // Properties of all 16 pads on the corresponding track
+  // Properties of all pads on the corresponding track
   const pads = timeline.tracks.find(track => track.name === self.name)!.pads;
 
   // Solo selected track, mute all others
@@ -97,57 +96,20 @@ const Track = ({ self, soundsData, playSound, timeline, setTimeline }: Props) =>
           <span><b>{self.name}</b></span>
         </div>
         <div className="w-[90%] flex gap-8 text-sm text-center">
-          {/* First Bar */}
-          <div className="w-[20%] flex justify-center gap-4">
-            {pads.slice(0, 4).map((pad, index) =>
-              <TimelinePad
-                key={index}
-                padProperties={pad}
-                stateProperties={self.state}
-                audioProperties={self.audio}
-                soundsData={soundsData}
-                playSound={playSound}
-              />
-            )}
-          </div>
-          {/* Second Bar */}
-          <div className="w-[20%] flex justify-center gap-4">
-            {pads.slice(4, 8).map((pad, index) =>
-              <TimelinePad
-                key={index}
-                padProperties={pad}
-                stateProperties={self.state}
-                audioProperties={self.audio}
-                soundsData={soundsData}
-                playSound={playSound}
-              />
-            )}
-          </div>
-          {/* Third Bar */}
-          <div className="w-[20%] flex justify-center gap-4">
-            {pads.slice(8, 12).map((pad, index) =>
-              <TimelinePad
-                key={index}
-                padProperties={pad}
-                stateProperties={self.state}
-                audioProperties={self.audio}
-                soundsData={soundsData}
-                playSound={playSound}
-              />
-            )}
-          </div>
-          {/* Fourth Bar */}
-          <div className="w-[20%] flex justify-center gap-4">
-            {pads.slice(12, 16).map((pad, index) =>
-              <TimelinePad
-                key={index}
-                padProperties={pad}
-                stateProperties={self.state}
-                audioProperties={self.audio}
-                soundsData={soundsData}
-                playSound={playSound}
-              />
-            )}
+          {/* Timeline Pads */}
+          <div className="w-[80%] timeline-scroll overflow-x-auto">
+            <div className="flex gap-4 min-w-max">
+              {pads.map((pad, index) => (
+                <TimelinePad
+                  key={index}
+                  padProperties={pad}
+                  stateProperties={self.state}
+                  audioProperties={self.audio}
+                  soundsData={soundsData}
+                  playSound={playSound}
+                />
+              ))}
+            </div>
           </div>
           {/* Audio Manipulation */}
           <div className="w-[20%] flex gap-5 justify-end items-center">

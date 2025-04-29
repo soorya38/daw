@@ -3,31 +3,6 @@ import MediaButton from './MediaButton';
 import TimelineButton from './TimelineButton';
 import Track from './Track';
 import Modal from './Modal';
-import timelineJSON from '../json/timeline.json';
-
-type TimelineJSON = {
-  settings: {
-    BPM: number,
-    masterVolume: number
-  },
-  tracks: {
-    name: string,
-    pads: {
-      kit: number | null,
-      sound: AudioBuffer | null,
-      playing: boolean
-    }[],
-    state: {
-      solo: boolean,
-      muted: boolean,
-      ignored: boolean
-    },
-    audio: {
-      volume: number,
-      panning: number
-    }
-  }[]
-}
 
 type Pad = {
   id: number,
@@ -40,22 +15,49 @@ type Pad = {
 
 type Kit = Pad[];
 
+type TimelinePad = {
+  kit: number | null,
+  sound: AudioBuffer | null,
+  playing: boolean
+}
+
+type TimelineTrack = {
+  name: string,
+  pads: TimelinePad[],
+  state: {
+    solo: boolean,
+    muted: boolean,
+    ignored: boolean
+  },
+  audio: {
+    volume: number,
+    panning: number
+  }
+}
+
+type TimelineState = {
+  settings: {
+    BPM: number,
+    masterVolume: number
+  },
+  tracks: TimelineTrack[]
+}
+
 type Props = {
   kits: Kit[],
   playSound: Function,
   BPM: number,
   setBPM: Function,
   masterVolume: number,
-  setMasterVolume: Function
+  setMasterVolume: Function,
+  steps: number,
+  timeline: TimelineState,
+  setTimeline: (timeline: TimelineState) => void
 }
 
-const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume }: Props) => {
-
+const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume, steps, timeline, setTimeline }: Props) => {
   // Timeline sequence on/off
   const [active, setActive] = useState(false);
-
-  // Timeline settings and track data
-  const [timeline, setTimeline] = useState<TimelineJSON>(timelineJSON);
 
   // Refs for timeline html utilities
   const timelineSpace = useRef<HTMLDivElement>(null);
@@ -89,7 +91,7 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
   // Play all armed timeline pads on a column
   const playColumn = async (column: number) => {
     const newTimeline = {...timeline};
-    newTimeline.tracks.forEach(track => {
+    newTimeline.tracks.forEach((track: TimelineTrack) => {
       // Deactivate previous column pads, and activate current column pads
       const prevColumn = (column - 1 < 0) ? (track.pads.length - 1) : (column - 1);
       const prevPad = track.pads[prevColumn];
@@ -98,7 +100,7 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
       currPad.playing = true;
 
       // Play sound
-      if (currPad.kit  && (track.state.solo || (!track.state.ignored && !track.state.muted))) {
+      if (currPad.kit && (track.state.solo || (!track.state.ignored && !track.state.muted))) {
         playSound(currPad.sound, track.audio.panning, track.audio.volume, newTimeline.settings.masterVolume);
 
         // Set soundboard pad animation
@@ -122,8 +124,8 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
   // Clear all tiles
   const clearTimeline = () => {
     const newTimeline = {...timeline};
-    newTimeline.tracks.forEach(track => {
-      track.pads.forEach(pad => {
+    newTimeline.tracks.forEach((track: TimelineTrack) => {
+      track.pads.forEach((pad: TimelinePad) => {
         pad.kit = null;
         pad.sound = null;
       });
@@ -136,13 +138,16 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
   const shuffleTimeline = () => {
     clearTimeline();
     const newTimeline = {...timeline};
-    newTimeline.tracks.forEach((track, index) => {
-      track.pads.forEach(pad => {
+    newTimeline.tracks.forEach((track: TimelineTrack) => {
+      track.pads.forEach((pad: TimelinePad) => {
         const isActive = Math.random() > 0.75;
         if (isActive) {
           const kit = Math.floor(Math.random() * 3) + 1;
           pad.kit = kit;
-          pad.sound = kits[kit-1][index].audio;
+          const soundData = kits[kit - 1].find(sound => sound.type === track.name);
+          if (soundData?.audio) {
+            pad.sound = soundData.audio;
+          }
         }
       });
     });
@@ -173,7 +178,7 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
       fr.onload = (e: any) => {
         setBPM(JSON.parse(e.target.result).settings.BPM);
         setMasterVolume(JSON.parse(e.target.result).settings.masterVolume);
-        setTimeline(JSON.parse(e.target.result))
+        setTimeline(JSON.parse(e.target.result));
       };
       fr.readAsText(event.target.files.item(0));
     });
@@ -183,6 +188,7 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
   const [modalContent, setModalContent] = useState(<div></div>);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [ignoreModal, setIgnoreModal] = useState(false);
+
   const clearModalContent = (
     <div>
       <h3 className="text-xl font-bold text-center text-secondary mb-5">Are you sure?</h3>
@@ -210,6 +216,7 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
       </div>
     </div>
   );
+
   const shuffleModalContent = (
     <div>
       <h3 className="text-xl font-bold text-center text-secondary mb-5">Are you sure?</h3>
@@ -257,12 +264,30 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
 
   // Update BPM and master volume after a change
   useEffect(() => {
-    const newTimeline = {...timeline}
+    const newTimeline = {...timeline};
     newTimeline.settings.BPM = BPM;
     newTimeline.settings.masterVolume = masterVolume;
-
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    setTimeline(newTimeline);
   }, [BPM, masterVolume]);
+
+  // Update timeline when steps change
+  useEffect(() => {
+    const newTimeline = {...timeline};
+    newTimeline.tracks.forEach((track: TimelineTrack) => {
+      // Add or remove pads based on steps
+      const currentPads = track.pads.length;
+      if (currentPads < steps) {
+        // Add new pads
+        for (let i = currentPads; i < steps; i++) {
+          track.pads.push({ kit: null, sound: null, playing: false });
+        }
+      } else if (currentPads > steps) {
+        // Remove excess pads
+        track.pads = track.pads.slice(0, steps);
+      }
+    });
+    setTimeline(newTimeline);
+  }, [steps]);
 
   // Timeline manager (starting & stopping)
   useEffect(() => {
@@ -272,7 +297,7 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
       valid = true;
       const play = async () => {
         while (valid)
-          for (let column = 0; column < timeline.tracks[0].pads.length && valid; column++)
+          for (let column = 0; column < timeline.tracks[0]?.pads.length && valid; column++)
             await playColumn(column);
       }
       play();
@@ -282,15 +307,13 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
     return () => {
       valid = false;
       const newTimeline = {...timeline};
-      newTimeline.tracks.forEach(track => {
-        track.pads.forEach(pad => {
+      newTimeline.tracks.forEach((track: TimelineTrack) => {
+        track.pads.forEach((pad: TimelinePad) => {
           pad.playing = false;
         });
       });
       setTimeline(newTimeline);
     }
-
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [active]);
 
   return (
@@ -319,36 +342,18 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
               </div>
             </div>
             <div className="w-[90%] flex gap-8 text-sm text-center">
-              {/* First Bar */}
-              <div className="w-1/5 flex justify-center gap-4">
-                <span className="w-8">1</span>
-                <span className="w-8">1.2</span>
-                <span className="w-8">1.3</span>
-                <span className="w-8">1.4</span>
-              </div>
-              {/* Second Bar */}
-              <div className="w-1/5 flex justify-center gap-4">
-                <span className="w-8">2</span>
-                <span className="w-8">2.2</span>
-                <span className="w-8">2.3</span>
-                <span className="w-8">2.4</span>
-              </div>
-              {/* Third Bar */}
-              <div className="w-1/5 flex justify-center gap-4">
-                <span className="w-8">3</span>
-                <span className="w-8">3.2</span>
-                <span className="w-8">3.3</span>
-                <span className="w-8">3.4</span>
-              </div>
-              {/* Fourth Bar */}
-              <div className="w-1/5 flex justify-center gap-4">
-                <span className="w-8">4</span>
-                <span className="w-8">4.2</span>
-                <span className="w-8">4.3</span>
-                <span className="w-8">4.4</span>
+              {/* Timeline Steps */}
+              <div className="w-[80%] timeline-scroll overflow-x-auto">
+                <div className="flex gap-4 min-w-max">
+                  {Array.from({ length: steps }, (_, i) => (
+                    <span key={i} className="w-8">
+                      {Math.floor(i / 4) + 1}.{(i % 4) + 1}
+                    </span>
+                  ))}
+                </div>
               </div>
               {/* Audio Manipulation */}
-              <div className="w-1/5 flex gap-5 justify-end items-center">
+              <div className="w-[20%] flex gap-5 justify-end items-center">
                 <div className="w-[10px]">&nbsp;</div>
                 <div className="w-[10px]">&nbsp;</div>
                 <div>
@@ -362,16 +367,16 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume 
           </div>
           {/* Tracks */}
           <div className="min-w-fit">
-            {timeline.tracks.map(track =>
+            {timeline.tracks.map((track: TimelineTrack) => (
               <Track
                 key={track.name}
                 self={track}
-                soundsData={kits.map(kit => kit.find(sound => sound.type === track.name)!)}
+                soundsData={kits.map(kit => kit.find(sound => sound.type === track.name)).filter(Boolean) as Pad[]}
                 playSound={playSound}
                 timeline={timeline}
                 setTimeline={setTimeline}
               />
-            )}
+            ))}
           </div>
           {/* Timeline main utilities */}
           <div className="flex gap-10 pt-5 w-1/2 m-auto justify-center">
