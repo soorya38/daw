@@ -191,7 +191,37 @@ const DAW = ({ audioContext }: Props) => {
   }, [kits, loadSounds]);
 
   return (
-    <div className="flex flex-col justify-center max-w-6xl h-[90vh] m-auto">
+    <div className="flex flex-col justify-center max-w-6xl h-[90vh] m-auto relative">
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{stopColor: '#ff6b9d', stopOpacity: 0.3}} />
+            <stop offset="100%" style={{stopColor: '#ffb3d9', stopOpacity: 0.3}} />
+          </linearGradient>
+        </defs>
+        <g className="animate-float-heart-1">
+          <path d="M 50 80 C 50 65, 30 55, 30 55 C 15 55, 15 70, 15 70 C 15 85, 30 100, 50 120 C 70 100, 85 85, 85 70 C 85 70, 85 55, 70 55 C 70 55, 50 65, 50 80 Z"
+                fill="url(#heartGradient)" opacity="0.4"/>
+        </g>
+        <g className="animate-float-heart-2">
+          <path d="M 90% 20% C 90% 15%, 88% 12%, 88% 12% C 86% 12%, 86% 15%, 86% 15% C 86% 20%, 88% 25%, 90% 30% C 92% 25%, 94% 20%, 94% 15% C 94% 15%, 94% 12%, 92% 12% C 92% 12%, 90% 15%, 90% 20% Z"
+                fill="#ffb3d9" opacity="0.5" transform="scale(0.8)"/>
+        </g>
+        <g className="animate-float-heart-3">
+          <circle cx="15%" cy="85%" r="3" fill="#c9a0dc" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="18%" cy="88%" r="2" fill="#ffb3d9" opacity="0.5">
+            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="4s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+        <g className="animate-float-heart-4">
+          <circle cx="85%" cy="75%" r="2.5" fill="#ff6b9d" opacity="0.5">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+      </svg>
+
       {/* Upper Bar Controls */}
       <TopControls
         BPM={BPM}
@@ -221,6 +251,34 @@ const DAW = ({ audioContext }: Props) => {
         timeline={timeline}
         setTimeline={setTimeline}
       />
+
+      <style>{`
+        @keyframes float-heart-1 {
+          0%, 100% { transform: translate(0, 0) rotate(0deg); }
+          33% { transform: translate(15px, -20px) rotate(8deg); }
+          66% { transform: translate(-8px, 15px) rotate(-5deg); }
+        }
+
+        @keyframes float-heart-2 {
+          0%, 100% { transform: translate(0, 0) scale(0.8); }
+          50% { transform: translate(-20px, 25px) scale(1); }
+        }
+
+        @keyframes float-heart-3 {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(10px, -15px); }
+        }
+
+        @keyframes float-heart-4 {
+          0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+          50% { transform: translate(-12px, 18px); opacity: 0.7; }
+        }
+
+        .animate-float-heart-1 { animation: float-heart-1 12s ease-in-out infinite; }
+        .animate-float-heart-2 { animation: float-heart-2 15s ease-in-out infinite; }
+        .animate-float-heart-3 { animation: float-heart-3 8s ease-in-out infinite; }
+        .animate-float-heart-4 { animation: float-heart-4 10s ease-in-out infinite; }
+      `}</style>
       {/* Custom Instrument Modal */}
       {showCustomInstrument && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

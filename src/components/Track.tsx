@@ -92,7 +92,7 @@ const Track = ({ self, soundsData, playSound, timeline, setTimeline }: Props) =>
   return (
     <div className="py-2">
       <div className="flex">
-        <div className="w-[10%] text-lg text-light-gray">
+        <div className="w-[10%] text-lg text-romantic-pink">
           <span><b>{self.name}</b></span>
         </div>
         <div className="w-[90%] flex gap-8 text-sm text-center">
@@ -116,7 +116,7 @@ const Track = ({ self, soundsData, playSound, timeline, setTimeline }: Props) =>
             {/* Solo */}
             <TrackUtility
               symbol={'S'}
-              activeColor={'#66c187'}
+              activeColor={'#ff6b9d'}
               role={soloTrack}
               property={self.state.solo}
               canBeIgnored={false}
@@ -125,7 +125,7 @@ const Track = ({ self, soundsData, playSound, timeline, setTimeline }: Props) =>
             {/* Mute */}
             <TrackUtility
               symbol={'M'}
-              activeColor={'#f08937'}
+              activeColor={'#ffb3d9'}
               role={muteTrack}
               property={self.state.muted}
               canBeIgnored={true}

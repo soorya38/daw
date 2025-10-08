@@ -195,13 +195,13 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume,
       <p className="text-lg text-secondary mb-5">This will clear all tiles from the current timeline</p>
       <div className="flex justify-between mb-5">
         <button
-          className="bg-secondary w-24 rounded-lg py-2 text-primary font-bold hover:brightness-75 shadow-lg"
+          className="bg-gradient-to-br from-romantic-cream to-romantic-pink w-24 rounded-lg py-2 text-primary font-bold hover:brightness-110 shadow-lg transition-all hover:scale-105"
           onClick={() => setModalVisibility(false)}
         >
           No
         </button>
         <button
-          className="bg-[#fa685b] w-24 rounded-lg py-2 text-primary font-bold hover:brightness-75 shadow-lg"
+          className="bg-gradient-to-br from-romantic-rose to-romantic-lavender w-24 rounded-lg py-2 text-white font-bold hover:brightness-110 shadow-lg transition-all hover:scale-105"
           onClick={() => {
             clearTimeline();
             setModalVisibility(false);
@@ -223,13 +223,13 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume,
       <p className="text-lg text-secondary mb-5">This will randomize all tiles from the current timeline</p>
       <div className="flex justify-between mb-5">
         <button
-          className="bg-secondary w-24 rounded-lg py-2 text-primary font-bold shadow-lg"
+          className="bg-gradient-to-br from-romantic-cream to-romantic-pink w-24 rounded-lg py-2 text-primary font-bold hover:brightness-110 shadow-lg transition-all hover:scale-105"
           onClick={() => setModalVisibility(false)}
         >
           No
         </button>
         <button
-          className="bg-[#008ef6] w-24 rounded-lg py-2 text-primary font-bold shadow-lg"
+          className="bg-gradient-to-br from-romantic-lavender to-romantic-pink w-24 rounded-lg py-2 text-white font-bold hover:brightness-110 shadow-lg transition-all hover:scale-105"
           onClick={() => {
             shuffleTimeline();
             setModalVisibility(false);
@@ -317,25 +317,25 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume,
   }, [active]);
 
   return (
-    <div className="bg-primary h-[80%] lg:h-[45%] max-h-80 rounded-b-xl relative shadow-lg">
+    <div className="bg-gradient-to-b from-primary to-romantic-burgundy h-[80%] lg:h-[45%] max-h-80 rounded-b-xl relative shadow-2xl border-b-2 border-romantic-pink">
       <div className="h-full px-8 pb-4">
         <div ref={timelineSpace} className="w-6xl h-full overflow-auto scroll-smooth" onScroll={() => handleScroll()}>
           {/* Top */}
-          <div ref={tracksContainer} className="flex sticky top-0 left-0 right-0 bg-primary z-10 min-w-fit overflow-auto py-4 text-light-gray font-semibold shadow-lg">
+          <div ref={tracksContainer} className="flex sticky top-0 left-0 right-0 bg-gradient-to-r from-primary via-romantic-burgundy to-primary z-10 min-w-fit overflow-auto py-4 text-romantic-pink font-semibold shadow-xl">
             {/* Media Buttons */}
             <div className="w-[10%]">
               <div className="flex gap-5 justify-start">
                 {/* Play */}
                 <MediaButton
                   svgPath={playPath}
-                  color={'#66c187'}
+                  color={'#ff6b9d'}
                   role={startTimeline}
                   disabled={active}
                 />
                 {/* Stop */}
                 <MediaButton
                   svgPath={stopPath}
-                  color={'#f08937'}
+                  color={'#ffb3d9'}
                   role={stopTimeline}
                   disabled={!active}
                 />
@@ -415,7 +415,7 @@ const Timeline = ({ kits, playSound, BPM, setBPM, masterVolume, setMasterVolume,
       </div>
       {/* Down Arrow */}
       <div className="py-1">
-        <svg ref={downArrow} onClick={() => scrollToBottom()} className="fill-light-gray w-[14px] m-auto transition-opacity cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+        <svg ref={downArrow} onClick={() => scrollToBottom()} className="fill-romantic-pink w-[14px] m-auto transition-opacity cursor-pointer hover:fill-romantic-rose" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
           <path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z" />
         </svg>
       </div>

@@ -24,29 +24,29 @@ export default function TopControls({
   onPianoClick 
 }: Props) {
   return (
-    <div className="flex justify-between bg-primary rounded-t-xl px-8 py-3 relative shadow-lg">
-      <div className="flex gap-8 items-center">
+    <div className="flex justify-between bg-gradient-to-r from-primary via-romantic-burgundy to-primary rounded-t-xl px-8 py-3 relative shadow-2xl border-t-2 border-romantic-rose">
+      <div className="flex gap-8 items-center relative z-10">
         {/* BPM */}
         <MasterBPM
           BPM={BPM}
           setBPM={setBPM}
         />
         {/* Steps */}
-        <TimelineSteps 
+        <TimelineSteps
           steps={steps}
           setSteps={setSteps}
         />
         {/* Add Custom Instrument */}
         <button
           onClick={onAddCustomClick}
-          className="bg-secondary px-4 py-1 rounded-lg text-primary font-bold hover:brightness-90"
+          className="bg-gradient-to-br from-romantic-rose to-romantic-pink px-4 py-1 rounded-lg text-white font-bold hover:brightness-110 shadow-lg transition-all hover:scale-105"
         >
           Add Custom
         </button>
         {/* Piano */}
         <button
           onClick={onPianoClick}
-          className="bg-secondary px-4 py-1 rounded-lg text-primary font-bold hover:brightness-90"
+          className="bg-gradient-to-br from-romantic-lavender to-romantic-pink px-4 py-1 rounded-lg text-white font-bold hover:brightness-110 shadow-lg transition-all hover:scale-105"
         >
           Piano
         </button>
